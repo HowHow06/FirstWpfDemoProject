@@ -78,13 +78,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ConfigurationHelper.cs" />
-    <Compile Include="Customer.cs" />
-    <Compile Include="DataAccessManager.cs" />
+    <Compile Include="src\ConfigurationHelper.cs" />
+    <Compile Include="src\Customer.cs" />
+    <Compile Include="src\DataAccessManager.cs" />
     <Compile Include="EditCustomerWindow.cs">
       <DependentUpon>EditCustomerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InputValidator.cs" />
+    <Compile Include="src\InputValidator.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
