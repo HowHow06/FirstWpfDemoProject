@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FirstWpfDemoProject.Utils;
 
 namespace FirstWpfDemoProject
 {
@@ -20,20 +21,28 @@ namespace FirstWpfDemoProject
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly string CONNECTION_NAME = "DemoCustomerDb";
-        private DataAccessManager db;
+        private readonly ApiAccessManager ApiAccess;
+       
         public MainWindow()
         {
             InitializeComponent();
-            db = new DataAccessManager(CONNECTION_NAME);
-            CustomerDataGrid.ItemsSource = db.GetAllCustomers();
+            ApiAccess = new ApiAccessManager("http://localhost:8000/", "api/customers");
+        }
+
+        private void Window_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            RefreshCustomerDataGrid();
+        }
+
+        private async void RefreshCustomerDataGrid() {
+            CustomerDataGrid.ItemsSource = await ApiAccess.GetCustomers();
         }
 
 
-        private void RunSearchCustomerButton_Clicked(object sender, RoutedEventArgs e)
+        private async void RunSearchCustomerButton_Clicked(object sender, RoutedEventArgs e)
         {
             string keywords = SearchCustomerNameTextBox.Text;
-            CustomerDataGrid.ItemsSource = db.SearchCustomersByName(keywords);
+            CustomerDataGrid.ItemsSource = await ApiAccess.GetCustomers(keywords);
         }
 
         private void SearchCustomerNameTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -52,13 +61,13 @@ namespace FirstWpfDemoProject
                 return;
             }
             var selectedCustomer = (Customer)CustomerDataGrid.SelectedItem;
-            Window editCustomerWindow = new EditCustomerWindow(db.GetCustomerById(selectedCustomer.CustomerId), db);
+            Window editCustomerWindow = new EditCustomerWindow(selectedCustomer, ApiAccess);
             editCustomerWindow.ShowDialog();
             CustomerDataGrid.SelectedIndex = -1;//reset selected index
-            CustomerDataGrid.ItemsSource = db.GetAllCustomers(); //refresh data grid
+            RefreshCustomerDataGrid(); //refresh data grid
         }
 
-        private void DeleteCustomerButton_Click(object sender, RoutedEventArgs e)
+        private async void DeleteCustomerButton_Click(object sender, RoutedEventArgs e)
         {
             int selectedIndex = CustomerDataGrid.SelectedIndex; //get selected index
             if (selectedIndex == -1)
@@ -67,15 +76,20 @@ namespace FirstWpfDemoProject
                 return;
             }
             var selectedCustomer = (Customer)CustomerDataGrid.SelectedItem;
-            db.DeleteCustomerById(selectedCustomer.CustomerId);
-            CustomerDataGrid.ItemsSource = db.GetAllCustomers(); //refresh data grid
+            if (await ApiAccess.DeleteCustomerById(selectedCustomer.CustomerId)) 
+                System.Windows.MessageBox.Show("Successfully deleted!");
+            else
+                System.Windows.MessageBox.Show("Deletion failed.");
+            RefreshCustomerDataGrid(); //refresh data grid
         }
 
         private void CreateCustomerButton_Click(object sender, RoutedEventArgs e)
         {
-            Window createCustomerWindow = new CreateCustomerWindow(db);
+            Window createCustomerWindow = new CreateCustomerWindow(ApiAccess);
             createCustomerWindow.ShowDialog();
-            CustomerDataGrid.ItemsSource = db.GetAllCustomers(); //refresh data grid
+            RefreshCustomerDataGrid(); //refresh data grid
         }
+
+        
     }
 }

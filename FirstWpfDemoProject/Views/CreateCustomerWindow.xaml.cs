@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using FirstWpfDemoProject.Utils;
 
 namespace FirstWpfDemoProject
 {
@@ -19,14 +20,14 @@ namespace FirstWpfDemoProject
     /// </summary>
     public partial class CreateCustomerWindow : Window
     {
-        private DataAccessManager Db;
-        public CreateCustomerWindow(DataAccessManager db)
+        private ApiAccessManager ApiAccess;
+        public CreateCustomerWindow(ApiAccessManager apiAccess)
         {
             InitializeComponent();
-            this.Db = db;
+            this.ApiAccess = apiAccess;
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private async void OkButton_Click(object sender, RoutedEventArgs e)
         {
             string firstName = FirstNameTextBox.Text.Trim();
             string lastName = LastNameTextBox.Text.Trim();
@@ -53,7 +54,7 @@ namespace FirstWpfDemoProject
                 return;
             }
 
-            if (this.Db.CreateOneCustomer(new Customer
+            if (await this.ApiAccess.CreateCustomer(new Customer
             {
                 FirstName = firstName,
                 LastName = lastName,

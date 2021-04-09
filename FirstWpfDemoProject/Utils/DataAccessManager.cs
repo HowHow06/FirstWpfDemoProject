@@ -31,6 +31,7 @@ namespace FirstWpfDemoProject
         public List<Customer> GetAllCustomers() {
             using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
             {
+                
                 string sp = "dbo.spCustomer_GetAll";
                 return connection.Query<Customer>(sp, commandType: CommandType.StoredProcedure).ToList();
             }
@@ -45,7 +46,8 @@ namespace FirstWpfDemoProject
             using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
             {
                 string sql = @"SELECT * FROM Customer WHERE CustomerId = @CustomerId";
-                return connection.Query<Customer>(sql, new { CustomerId = customerId }).ToList().First();//return the first customer with the same customer id
+                var result = connection.Query<Customer>(sql, new { CustomerId = customerId }).ToList();//return the first customer with the same customer id
+                return result.Count > 0 ? result.First() : null; //return the first child if the list is not null
             }
         }
 
@@ -86,7 +88,7 @@ namespace FirstWpfDemoProject
             using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
             {
                 string sp = "dbo.spCustomer_UpdateById";
-                int affectedRowsCount = connection.Execute(sp, new { CustomerId = customer.CustomerId, FirstName = customer.FirstName, LastName = customer.LastName, Email = customer.Email, PhoneNumber = customer.PhoneNumber}, commandType: CommandType.StoredProcedure);
+                int affectedRowsCount = connection.Execute(sp, new { customer.CustomerId, customer.FirstName, customer.LastName, customer.Email, customer.PhoneNumber}, commandType: CommandType.StoredProcedure);
                 return affectedRowsCount == 1;
             }
         }
@@ -100,7 +102,7 @@ namespace FirstWpfDemoProject
             using (IDbConnection connection = new SqlConnection(CONNECTION_STRING))
             {
                 string sp = "dbo.spCustomer_CreateOneCustomer";
-                int affectedRowsCount = connection.Execute(sp, new { FirstName = newCustomer.FirstName, LastName = newCustomer.LastName, Email = newCustomer.Email, PhoneNumber = newCustomer.PhoneNumber }, commandType: CommandType.StoredProcedure);
+                int affectedRowsCount = connection.Execute(sp, new { newCustomer.FirstName, newCustomer.LastName, newCustomer.Email, newCustomer.PhoneNumber }, commandType: CommandType.StoredProcedure);
                 return affectedRowsCount == 1;
             }
         }

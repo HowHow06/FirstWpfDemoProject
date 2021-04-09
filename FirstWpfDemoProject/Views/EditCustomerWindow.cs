@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using FirstWpfDemoProject.Utils;
 
 namespace FirstWpfDemoProject
 {
@@ -20,13 +21,13 @@ namespace FirstWpfDemoProject
     public partial class EditCustomerWindow : Window
     {
         private Customer CustomerToEdit;
-        private DataAccessManager Db;
+        private ApiAccessManager ApiAccess;
 
-        public EditCustomerWindow(Customer customer, DataAccessManager db)
+        public EditCustomerWindow(Customer customer, ApiAccessManager apiAccess)
         {
             InitializeComponent();
             this.CustomerToEdit = customer;
-            this.Db = db;
+            this.ApiAccess = apiAccess;
             FillTextBox(this.CustomerToEdit);
         }
 
@@ -48,7 +49,7 @@ namespace FirstWpfDemoProject
             this.Close();
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private async void OkButton_Click(object sender, RoutedEventArgs e)
         {
             string firstName = FirstNameTextBox.Text.Trim();
             string lastName = LastNameTextBox.Text.Trim();
@@ -79,7 +80,7 @@ namespace FirstWpfDemoProject
             this.CustomerToEdit.LastName = lastName;
             this.CustomerToEdit.Email = email;
             this.CustomerToEdit.PhoneNumber = phoneNumber;
-            if (this.Db.UpdateCustomerById(this.CustomerToEdit))
+            if (await this.ApiAccess.UpdateCustomerById(this.CustomerToEdit.CustomerId, this.CustomerToEdit))
                 System.Windows.MessageBox.Show("Successfully updated.");
             else
                 System.Windows.MessageBox.Show("Record not updated.");

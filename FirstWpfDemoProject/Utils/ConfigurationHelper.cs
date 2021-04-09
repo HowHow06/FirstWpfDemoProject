@@ -11,6 +11,7 @@ namespace FirstWpfDemoProject
     {
         public static string GetConnectionString(string connectionName)
         {
+           
             return ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
         }
     }
